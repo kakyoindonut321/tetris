@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Canvas Pixel Grid</title>
+    <style>
+      body {
+        background-image: url("img/cool-af.webp");
+        background-size: 100%;
+        /* background-repeat: no-repeat; */
+      }
+
+      canvas {
+        /* 256px 320px */
+        image-rendering: pixelated;
+        width: 384px;
+        height: 480px;
+        border: 5px solid gray;
+        background: black;
+      }
+      .container {
+        display: flex;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <canvas id="screen" width="256" height="320"></canvas>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
