@@ -307,14 +307,20 @@ class TetrisBoard {
         drawText(fixed_6_digit(this.informations.score), amp(this.sideinfostart), amp(6.5));
 
         //status
-        for (let x = 0; x < 4; x++) {
-            drawpixel(amp(this.sideinfostart + x + 1), amp(8), "#000000");
-            drawpixel(amp(this.sideinfostart + x + 1), amp(9), "#000000");
-        }
-        
         if (this.informations.status) {
+            for (let x = 0; x < 4; x++) {
+                drawpixel(amp(this.sideinfostart + x + 1), amp(8), "#000000");
+                drawpixel(amp(this.sideinfostart + x + 1), amp(9), "#000000");
+            }
             drawText("GAME", amp(this.sideinfostart + 1), amp(8.5));
             drawText("OVER", amp(this.sideinfostart + 1), amp(9.5));
+        }
+
+        // level
+        for (let x = 0; x < 4; x++) {
+            for (let y = 0; y < 4; y++) {
+                drawpixel(amp(this.sideinfostart + 1 + x), amp(y + 12), "#000000");
+            }
         }
     }
 
@@ -347,12 +353,11 @@ class Game {
         this.currentblock = {};
 
         // the smaller, the faster
-        this.delaytimer = 20;
-        this.updatespeed = 20;
+        this.delaytimer = 10;
+        this.updatespeed = 10;
         this.tetroarray = [tetrominos.I, tetrominos.J, tetrominos.L, tetrominos.O, 
                                 tetrominos.S, tetrominos.T, tetrominos.Z];
         this.board = board;
-        this.groundtimer = 10;
         this.grounded = false;
         this.shifttrigger = false;
         this.shiftdelay = 5;
@@ -593,7 +598,14 @@ class Game {
             
             if (!overlap) {
                 if (this.board.grid[clone[i].x][clone[i].y] != "#000000") {
-                    if (dd.dy != 0) {
+                    if (dd.dy != 0 && dd.dx != 0) {
+                        var tempdx = dd.dx;
+                        clone[i].x -= dd.dx;
+                        if (this.currentblock.activesquares.some(point => point.x == clone[i].x && point.y == clone[i].y)) {
+                            dd.dy = 0;
+                        }
+                        clone[i].x += tempdx;
+                    } else if (dd.dy != 0) {
                         this.grounded = true;
                         dd.dy = 0;
                     } else {
@@ -604,6 +616,7 @@ class Game {
                 }
             }
         }
+
         return false;
     }
 
