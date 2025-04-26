@@ -517,10 +517,9 @@ class Game {
     update_pos(dx, dy) {
         if (dx == 0 && dy == 0) return;
         // if (this.border_check(dx, dy)) return;
-        // if (this.intersect(dx, dy)) return;
         const dd = {dx: dx, dy: dy};
         this.border_check(dd);
-        this.intersect(dd)
+        this.intersect(dd);
         
         this.currentblock.position.x += dd.dx;
         this.currentblock.position.y += dd.dy;
@@ -588,35 +587,62 @@ class Game {
 
     intersect(dd) {
         const clone = structuredClone(this.currentblock.activesquares);
+        const clone2 = structuredClone(this.currentblock.activesquares);
+        // for (let i = 0; i < clone.length; i++) {
+        //     clone[i].x += dd.dx;
+        //     clone[i].y += dd.dy;
 
+        //     var overlap = false;
+        //     overlap = this.currentblock.activesquares.some(point => point.x == clone[i].x && point.y == clone[i].y);
+            
+        //     if (!overlap) {
+        //         if (this.board.grid[clone[i].x][clone[i].y] != "#000000") {
+        //             if (dd.dy != 0) {
+        //                 this.grounded = true;
+        //                 dd.dy = 0;
+        //             } else {
+        //                 this.grounded = false;
+        //             }
+        //             dd.dx = 0;
+        //             return true;
+        //         }
+        //     }
+        // }
+        var detected = false;
         for (let i = 0; i < clone.length; i++) {
             clone[i].x += dd.dx;
-            clone[i].y += dd.dy;
 
             var overlap = false;
             overlap = this.currentblock.activesquares.some(point => point.x == clone[i].x && point.y == clone[i].y);
             
             if (!overlap) {
                 if (this.board.grid[clone[i].x][clone[i].y] != "#000000") {
-                    if (dd.dy != 0 && dd.dx != 0) {
-                        var tempdx = dd.dx;
-                        clone[i].x -= dd.dx;
-                        if (this.currentblock.activesquares.some(point => point.x == clone[i].x && point.y == clone[i].y)) {
-                            dd.dy = 0;
-                        }
-                        clone[i].x += tempdx;
-                    } else if (dd.dy != 0) {
+                    dd.dx = 0;
+                    detected = true;
+                    break;
+                }
+            }
+        }
+            
+        for (let i = 0; i < clone2.length; i++) {
+            clone2[i].y += dd.dy;
+
+            var overlap = false;
+            overlap = this.currentblock.activesquares.some(point => point.x == clone2[i].x && point.y == clone2[i].y);
+            
+            if (!overlap) {
+                if (this.board.grid[clone2[i].x][clone2[i].y] != "#000000") {
+                    if (dd.dy != 0) {
                         this.grounded = true;
                         dd.dy = 0;
                     } else {
                         this.grounded = false;
                     }
-                    dd.dx = 0;
-                    return true;
+                    detected = true;
+                    break;
                 }
             }
         }
-
         return false;
     }
 
@@ -780,6 +806,11 @@ class Game {
 
 
 // main code
+// window.addEventListener('beforeunload', function (e) {
+//     e.preventDefault(); 
+//     e.returnValue = '';
+// });
+
 const keystate = new KeyState();
 const board = new TetrisBoard(10, 20);
 const game = new Game(board);
