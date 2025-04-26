@@ -483,6 +483,8 @@ class Game {
                     dy += 1;
                     this.delaytimer = this.updatespeed;
                 }
+            } else {
+                // this.delaytimer = 0;
             }
         }
 
@@ -509,16 +511,19 @@ class Game {
 
     update_pos(dx, dy) {
         if (dx == 0 && dy == 0) return;
-        if (this.border_check(dx, dy)) return;
-        if (this.intersect(dx, dy)) return;
+        // if (this.border_check(dx, dy)) return;
+        // if (this.intersect(dx, dy)) return;
+        const dd = {dx: dx, dy: dy};
+        this.border_check(dd);
+        this.intersect(dd)
         
-        this.currentblock.position.x += dx;
-        this.currentblock.position.y += dy;
+        this.currentblock.position.x += dd.dx;
+        this.currentblock.position.y += dd.dy;
 
         this.currentblock.activesquares.forEach(point => {
             this.board.grid[point.x][point.y] = "#000000";
-            point.x += dx;
-            point.y += dy;
+            point.x += dd.dx;
+            point.y += dd.dy;
         });
         
     }
@@ -556,46 +561,50 @@ class Game {
         return false
     }
 
-    border_check(dx, dy) {
+    border_check(dd) {
         const clone = structuredClone(this.currentblock.activesquares);
 
         for (let i = 0; i < clone.length; i++) {
-            clone[i].x += dx;
-            clone[i].y += dy;
+            clone[i].x += dd.dx;
+            clone[i].y += dd.dy;
 
-                if (clone[i].y + 1 >= this.board.gridH) {
-                    this.grounded = true;
-                }
+            if (clone[i].y >= this.board.gridH) {
+                this.grounded = true;
+                dd.dy = 0;
+            }
 
             if (clone[i].x >= this.board.gridW || clone[i].x < 0) {
+                dd.dx = 0;
                 return true;
             }
         }
-        return false
+        return false;
     }
 
-    intersect(dx, dy) {
+    intersect(dd) {
         const clone = structuredClone(this.currentblock.activesquares);
 
         for (let i = 0; i < clone.length; i++) {
-            clone[i].x += dx;
-            clone[i].y += dy;
+            clone[i].x += dd.dx;
+            clone[i].y += dd.dy;
 
             var overlap = false;
             overlap = this.currentblock.activesquares.some(point => point.x == clone[i].x && point.y == clone[i].y);
             
             if (!overlap) {
                 if (this.board.grid[clone[i].x][clone[i].y] != "#000000") {
-                    if (dy != 0) {
+                    if (dd.dy != 0) {
                         this.grounded = true;
+                        dd.dy = 0;
                     } else {
                         this.grounded = false;
                     }
+                    dd.dx = 0;
                     return true;
                 }
             }
         }
-        return false
+        return false;
     }
 
     validrotation(clo, dx, dy) {
